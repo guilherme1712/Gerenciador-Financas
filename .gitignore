@@ -1,0 +1,20 @@
+/node_modules
+/public/hot
+/public/storage
+/public/css
+/public/img
+/public/js
+/public/mix-manifest.json
+/storage/*.key
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+WSL DB.session.sql
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
