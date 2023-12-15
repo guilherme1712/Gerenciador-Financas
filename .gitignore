@@ -18,3 +18,9 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+
+# Ignorar o arquivo composer.lock
+composer.lock
+
+# Ignorar o arquivo package-lock.json
+package-lock.json
