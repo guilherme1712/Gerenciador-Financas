@@ -10,6 +10,8 @@
 .env
 .env.backup
 .phpunit.result.cache
+composer.lock
+package-lock.json
 WSL DB.session.sql
 docker-compose.override.yml
 Homestead.json
@@ -18,9 +20,3 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
-
-# Ignorar o arquivo composer.lock
-composer.lock
-
-# Ignorar o arquivo package-lock.json
-package-lock.json
