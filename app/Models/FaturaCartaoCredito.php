@@ -23,7 +23,7 @@ class FaturaCartaoCredito
         $dataFechamento = Carbon::parse($hoje->format('Y-m-') . $ultimaFatura->dia_fechamento);
 
         if ($hoje->between($dataVencimento, $dataFechamento)) {
-            $mesReferenciaProximaFatura = $hoje->addMonth()->format('Y/m');
+            $mesReferenciaProximaFatura = $hoje->addMonth()->format('Y-m');
 
             $dataFechamentoProximaFatura = $ultimaFatura->dia_fechamento;
 
@@ -74,7 +74,7 @@ class FaturaCartaoCredito
         $dataFechamento = $diaVencimentoCarbon->subDays(7)->format('d');
 
         return DB::table('faturas_cartao_credito')->insertGetId([
-            'mes_referencia' => $mesReferencia ?? now()->addMonth()->format('Y/m'),
+            'mes_referencia' => $mesReferencia ?? now()->addMonth()->format('Y-m'),
             'valor' => $valor,
             'dia_fechamento' => $dataFechamento,
             'dia_vencimento' => $diaVencimento,

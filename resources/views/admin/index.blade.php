@@ -6,25 +6,47 @@
     <div class="container mt-5">
         <h2 class="mb-4">Finanças</h2>
 
-        <!-- Botões para administrar categorias -->
+        <!-- Menu Administrar -->
         <div class="mb-4">
-            <div class="btn-group mr-2" role="group" aria-label="Administrar Categorias">
-                <a href="{{ route('admin.categorias.index') }}" class="btn btn-primary">Ver Categorias</a>
-                <a href="{{ route('admin.categorias.add') }}" class="btn btn-primary">Criar Categorias</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{{ route('admin.categorias.index') }}">Ver Categorias</a>
+                    <a class="dropdown-item" href="{{ route('admin.categorias.add') }}">Criar Categorias</a>
+                </div>
             </div>
         </div>
 
-        <!-- Botões para administrar bancos e faturas de cartão de crédito -->
+        <!-- Menu Bancos e Faturas -->
         <div class="mb-4">
-            <div class="btn-group mr-2" role="group" aria-label="Administrar Bancos e Faturas">
-                <a href="#" class="btn btn-primary">Administrar Bancos</a>
-                <a href="{{ route('fatura.criar-manualmente') }}" class="btn btn-primary">Criar Manualmente Faturas de Cartão de Crédito</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Bancos e Faturas</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Administrar Bancos</a>
+                    <a class="dropdown-item" href="{{ route('fatura.criar-manualmente') }}">Criar Manualmente Faturas de Cartão de Crédito</a>
+                </div>
             </div>
         </div>
 
         <!-- Botão para voltar para o menu -->
         <div class="mb-4">
             <a href="{{ route('menu') }}" class="btn btn-secondary">Voltar para o Menu</a>
+        </div>
+
+        <div class="mb-4">
+            <a href="{{ route('enviarEmailContas') }}" class="btn btn-secondary">Enviar email para gdaudt17@gmail.com</a>
+        </div>
+
+        <div class="mb-4">
+            <a href="{{ route('verificarRegistrosEmailContas') }}" class="btn btn-secondary">Teste enviar email contas detalhes</a>
+        </div>
+
+        <div class="mb-4">
+            <a href="{{ route('testarCriarFatura') }}" class="btn btn-secondary">Teste criar faturas</a>
+        </div>
+
+        <div class="mb-4">
+            <a href="{{ route('exportToExcel') }}" class="btn btn-secondary">Gerar exel contas do mês</a>
         </div>
 
         <!-- Conteúdo principal da página -->

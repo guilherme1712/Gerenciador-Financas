@@ -17,7 +17,6 @@ class FaturaCartaoCreditoController extends Controller
     public function index()
     {
         $faturas = $this->faturaCartaoCredito->getAllFaturas();
-
         return view('faturas.index', compact('faturas'));
     }
 
@@ -76,8 +75,6 @@ class FaturaCartaoCreditoController extends Controller
         $diaVencimento = $request->input('diaVencimento');
         $mesReferencia = $request->input('mesReferencia');
         $status = $request->input('status');
-
-        // dump($valor, $diaVencimento, $mesReferencia, $status);
 
         $this->faturaCartaoCredito->salvarManualmente($valor, $diaVencimento, $mesReferencia, $status);
 

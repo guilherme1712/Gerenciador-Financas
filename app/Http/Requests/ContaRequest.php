@@ -27,7 +27,7 @@ class ContaRequest extends FormRequest
             'data' => 'required|date',
             'descricao' => 'required|string',
             'valor' => 'required|numeric',
-            'recorrente' => 'required|in:0,1',
+            'recorrente' => 'required|in:0,1,2,',
             'data_termino_recorrente' => $this->input('recorrente') == '1' ? 'required|date' : 'nullable|date',
             'status' => 'required|in:0,1',
             'banco' => 'required|exists:bancos,id_banco',

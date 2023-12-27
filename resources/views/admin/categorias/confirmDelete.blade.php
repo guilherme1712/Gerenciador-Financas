@@ -72,6 +72,11 @@
             <input type="text" id="secao" name="secao" value="{{ $categoria->secao }}" class="form-control" readonly>
         </div>
 
+        <div class="form-group">
+            <label for="ativo">Ativo:</label>
+            <input type="text" id="ativo" name="ativo" value="{{ $categoria->ativo = 0 ? 'Não' : 'Sim' }}" class="form-control" readonly>
+        </div>
+
         <form method="post" action="{{ route('admin.categorias.destroy', ['id' => $categoria->id]) }}">
             @csrf
             @method('delete')

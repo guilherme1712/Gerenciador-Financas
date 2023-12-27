@@ -6,14 +6,16 @@ use App\Models\Financa;
 use Illuminate\Http\Request;
 use App\Http\Requests\ContaRequest;
 use App\Http\Requests\CreditoRequest;
+use App\Http\Controllers\EmailController;
 
 class FinancasController extends Controller
 {
     private $financa;
-    public function __construct(Financa $financa)
+    public function __construct()
     {
-        $this->financa = $financa;
+        $this->financa = new Financa();
     }
+
     public function index()
     {
         $contas = $this->financa->searchBillings();
@@ -23,7 +25,26 @@ class FinancasController extends Controller
         $totalCreditos = array_sum(array_column($creditos, 'valor'));
         $totalMes = ($totalCreditos - $totalContas);
 
-        return view('financas.index', compact('contas', 'creditos', 'totalContas', 'totalCreditos', 'totalMes'));
+        return view('financas.index', compact('totalContas', 'totalCreditos', 'totalMes'));
+    }
+
+    public function ajaxGetContas()
+    {
+        $contas = $this->financa->searchBillings();
+        return view('financas.partials.contas', compact('contas'));
+    }
+
+    public function ajaxGetCreditos()
+    {
+        $creditos = $this->financa->searchCreditos();
+        return view('financas.partials.creditos', compact('creditos'));
+    }
+
+    public function ajaxGetEmailsRecebidos()
+    {
+        $emailController = new EmailController();
+        $emailsRecebidos = $emailController->receberEmails();
+        return view('financas.partials.emails', compact('emailsRecebidos'));
     }
 
     public function addConta()
@@ -49,6 +70,11 @@ class FinancasController extends Controller
     {
         if ($request->isMethod('post')) {
             $data = $request->input();
+
+
+            if ($data['recorrente'] == 0) {
+                $data['recorrente'] = 2;
+            }
 
             // Se recorrente for 1 e data_termino_recorrente estiver definido
             if ($data['recorrente'] == 1 && isset($data['data_termino_recorrente'])) {
@@ -81,7 +107,6 @@ class FinancasController extends Controller
                 // Se não for recorrente ou data_termino_recorrente não estiver definido, salve a conta única
                 $this->financa->saveConta($data);
             }
-
             return redirect()->route('home');
         }
     }
@@ -409,7 +434,6 @@ class FinancasController extends Controller
 
         if ($request->isMethod('post')) {
             $data = $this->financa->countContasCreditos($tipoConta);
-
             if ($tipoConta === 'contas') {
                 return response()->json(['contasCount' => $data]);
             } elseif ($tipoConta === 'creditos') {
@@ -419,6 +443,26 @@ class FinancasController extends Controller
             }
         } else {
             return response()->json(['error' => 'Request não é do tipo post'], 404);
+        }
+    }
+
+    public function verificarRegistrosEmailContas()
+    {
+        $dataVencimento = date('Y-m-d', strtotime('+1 day'));
+        $registros = $this->financa->obterContasPorVencimentoEStatus($dataVencimento);
+        dump($registros, $dataVencimento);
+
+        if ($registros->count() > 0) {
+            $emailController = new EmailController();
+            $resultadoEnvioEmail = $emailController->enviarEmailContas();
+
+            if (strpos($resultadoEnvioEmail, 'enviado com sucesso') !== false) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 }

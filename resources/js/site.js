@@ -9,8 +9,46 @@ $(document).ready(function() {
     startDataTable();
     countIndex('contas');
     countIndex('creditos');
-
+    selectDataRecorrente();
+    getTablesIndexFinancas();
 });
+
+function getTablesIndexFinancas() {
+    // Contas
+    $.ajax({
+        url: "/APIs/Laravel/Gerenciador-Financas/public/financas/ajaxGetContas",
+        success: function (data) {
+            $('.contas-table').html(data);
+        }
+    });
+
+    // Créditos
+    $.ajax({
+        url: "/APIs/Laravel/Gerenciador-Financas/public/financas/ajaxGetCreditos",
+        success: function (data) {
+            $('.creditos-table').html(data);
+        }
+    });
+
+    // E-mails
+    $.ajax({
+        url: "/APIs/Laravel/Gerenciador-Financas/public/financas/ajaxGetEmailsRecebidos",
+        success: function (data) {
+            $('.emails-table').html(data);
+        }
+    });
+}
+
+function selectDataRecorrente() {
+    $('#recorrente').on('change', function () {
+        // Se recorrente é igual a 'Sim'
+        if ($(this).val() === '1') {
+            $('#data_termino_recorrente_container').show();
+        } else {
+            $('#data_termino_recorrente_container').hide();
+        }
+    });
+}
 
 function countIndex(tipoConta) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');

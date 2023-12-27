@@ -36,7 +36,7 @@
                     <tr>
                         <td>{{ $credito->descricao }}</td>
                         <td>{{ date('d/m/Y', strtotime($credito->data)) }}</td>
-                        <td>{{ 'R$ '. $credito->valor }}</td>
+                        <td>R$ {{ number_format($credito->valor, 2, ',', '.') }}</td>
                         <td>{{ $credito->recorrente ? 'Sim' : 'Não' }}</td>
                         <td>{{ date('d/m/Y', strtotime($credito->data_termino_recorrente)) }}</td>
                         <td>{{ $credito->nomeBanco }}</td>

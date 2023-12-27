@@ -2,8 +2,9 @@
 
 namespace App\Console;
 
-use App\Models\FaturaCartaoCredito;
+use App\Jobs\CriarFaturaCartaoCreditoJob;
 use Illuminate\Console\Scheduling\Schedule;
+use App\Jobs\verificarRegistrosEmailContasJob;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -16,7 +17,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('fatura:criar')->monthly();
+        $schedule->job(new verificarRegistrosEmailContasJob())->everyFiveMinutes();
+        $schedule->job(new CriarFaturaCartaoCreditoJob())->everyFiveMinutes();
     }
 
     /**

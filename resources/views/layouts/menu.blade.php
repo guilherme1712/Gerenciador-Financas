@@ -19,7 +19,7 @@
 
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}"></script>
-        <script src="{{ asset('js/datatables.js') }}"></script>
+        <!-- <script src="{{ asset('js/datatables.js') }}"></script> -->
         <!-- <script src="{{ asset('js/site.js') }}"></script> -->
 
         <style>

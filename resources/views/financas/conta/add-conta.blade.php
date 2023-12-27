@@ -12,9 +12,16 @@
             {{ Form::hidden('id', null) }}
 
             <div class="form-group row">
-                {{ Form::label('data', 'Data:', ['class' => 'col-md-2 col-form-label']) }}
+                {{ Form::label('data', 'Data:', ['class' => 'col-md-2 col-form-label', 'style' => 'display:none;']) }}
                 <div class="col-md-10">
-                    {{ Form::date('data', date('Y-m-d'), ['class' => 'form-control']) }}
+                    {{ Form::date('data', date('Y-m-d'), ['class' => 'form-control', 'style' => 'display:none;']) }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                {{ Form::label('vencimento', 'Vencimento:', ['class' => 'col-md-2 col-form-label']) }}
+                <div class="col-md-10">
+                    {{ Form::date('vencimento', date('Y-m-d'), ['class' => 'form-control']) }}
                 </div>
             </div>
 
@@ -35,11 +42,11 @@
             <div class="form-group row">
                 {{ Form::label('recorrente', 'Recorrente?', ['class' => 'col-md-2 col-form-label']) }}
                 <div class="col-md-10">
-                    {{ Form::select('recorrente', ['1' => 'Sim', '0' => 'Não'], '1', ['class' => 'form-control']) }}
+                    {{ Form::select('recorrente', ['0' => 'Selecione', '1' => 'Sim', '2' => 'Não'], '', ['class' => 'form-control']) }}
                 </div>
             </div>
 
-            <div class="form-group row">
+            <div class="form-group row" id="data_termino_recorrente_container" style="display: none;">
                 {{ Form::label('data_termino_recorrente', 'Até quando é recorrente?', ['class' => 'col-md-2 col-form-label']) }}
                 <div class="col-md-10">
                     {{ Form::date('data_termino_recorrente', date('Y-m-d'), ['class' => 'form-control']) }}

@@ -85,7 +85,7 @@
                             <tr>
                                 <td>{{ date('d/m/Y', strtotime($listadoCredito->data)) }}</td>
                                 <td>{{ $listadoCredito->descricao }}</td>
-                                <td>{{ $listadoCredito->valor }}</td>
+                                <td>R$ {{ number_format($listadoCredito->valor, 2, ',', '.') }}</td>
                                 <td>{{ $listadoCredito->recorrente ? 'Sim' : 'Não' }}</td>
                                 <td>{{ date('d/m/Y', strtotime($listadoCredito->data_termino_recorrente)) }}</td>
                                 <td>{{ $listadoCredito->nome }}</td>

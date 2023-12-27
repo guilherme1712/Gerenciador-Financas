@@ -77,6 +77,7 @@
                 <tr>
                     <th>Nome</th>
                     <th>Seção</th>
+                    <th>Ativo</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -86,6 +87,7 @@
                     <tr>
                         <td>{{ $categoria->nome }}</td>
                         <td>{{ ($categoria->secao == 1) ? 'Contas' : 'Créditos' }}</td>
+                        <td>{{ ($categoria->ativo == 1) ? 'Sim' : 'Não' }}</td>
                         <td>
                             <a href="{{ route('admin.categorias.edit', ['id' => $categoria->id]) }}" class="btn-outline-primary">
                                 <i class="fa-solid fa-pen-to-square"></i>

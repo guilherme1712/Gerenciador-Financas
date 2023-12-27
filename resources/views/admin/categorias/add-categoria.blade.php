@@ -30,6 +30,12 @@
                 </div>
             </div>
 
+            <div class="form-group row">
+                {{ Form::label('ativo', 'Ativo?:', ['class' => 'col-md-2 col-form-label']) }}
+                <div class="col-md-10">
+                    {{ Form::select('ativo', ['0' => 'Não', '1' => 'Sim'], 1, ['class' => 'form-control']) }}
+                </div>
+            </div>
 
             <div class="form-group text-center">
                 {{ Form::submit('Adicionar Categoria', ['class' => 'btn btn-primary']) }}

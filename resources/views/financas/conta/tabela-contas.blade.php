@@ -36,7 +36,7 @@
                     <tr>
                         <td>{{ $conta->descricao }}</td>
                         <td>{{ date('d/m/Y', strtotime($conta->data)) }}</td>
-                        <td>{{ 'R$ '. $conta->valor }}</td>
+                        <td>R$ {{ number_format($conta->valor, 2, ',', '.') }}</td>
                         <td>{{ $conta->recorrente ? 'Sim' : 'Não' }}</td>
                         <td>{{ date('d/m/Y', strtotime($conta->data_termino_recorrente)) }}</td>
                         <td>{{ $conta->nomeBanco }}</td>

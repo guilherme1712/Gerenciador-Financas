@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,21 +22,21 @@ class Financa extends Model
         if ($detalhes) {
             $results->where('c.id', '=', $id);
         } else {
-            $results->where('c.data_termino_recorrente', '>=', $firstDayOfMonth)
-                    ->where('c.data_termino_recorrente', '<=', $lastDayOfMonth)
-                    ->whereIn('cc.categoria_id', [1,4]);
+            $results->where(function ($query) use ($firstDayOfMonth, $lastDayOfMonth) {
+                $query->whereBetween('c.data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth]);
+            });
         }
 
-        $results = $results->where('cc.secao', '=', 1)
-            ->orderBy('c.data_termino_recorrente')
-            ->get();
+        $results = $results->where('cc.secao', '=', 1)->where('cc.ativo', '!=', 0)->orderBy('c.data_termino_recorrente')->get();
 
         return $results->toArray();
     }
 
     public function searchCreditos(int $id = null, bool $detalhes = false): array
     {
+        $today = now()->toDateString();
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
+        $middleOfMonth = now()->firstOfMonth()->addDays(15)->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
         $results = DB::table('creditos as c')
@@ -46,22 +47,20 @@ class Financa extends Model
         if ($detalhes) {
             $results->where('c.id', '=', $id);
         } else {
-            $results->where('c.data_termino_recorrente', '>=', $firstDayOfMonth)
-                    ->where('c.data_termino_recorrente', '<=', $lastDayOfMonth)
-                    ->whereIn('cc.categoria_id', [1,2]);
+            $results->where(function ($query) use ($firstDayOfMonth, $middleOfMonth) {
+                $query->whereBetween('c.data_termino_recorrente', [$firstDayOfMonth, $middleOfMonth]);
+            })->orWhere(function ($query) use ($middleOfMonth, $lastDayOfMonth) {
+                $query->whereBetween('c.data_termino_recorrente', [$middleOfMonth, $lastDayOfMonth]);
+            });
         }
-
-        $results = $results->where('cc.secao', '=', 2)
-            ->orderBy('c.data_termino_recorrente')
-            ->get();
-
+        $results = $results->where('cc.secao', '=', 2)->where('cc.ativo', '!=', 0)->orderBy('c.data_termino_recorrente')->get();
         return $results->toArray();
     }
+
 
     public function getBancos(): array
     {
         $results = DB::table('bancos as b')->get();
-
         return $results->toArray();
     }
 
@@ -69,8 +68,8 @@ class Financa extends Model
     {
         $results = DB::table('categorias')
             ->where('secao', $secao)
-            ->get();
-
+            ->where('ativo', '!=', 0)
+        ->get();
         return $results->toArray();
     }
 
@@ -85,6 +84,7 @@ class Financa extends Model
             'status' => $conta['status'],
             'banco' => $conta['banco'],
             'categoria' => $conta['categoria'],
+            'vencimento' => $conta['vencimento'],
         ];
 
         $id = (int)$conta['id'];
@@ -110,8 +110,8 @@ class Financa extends Model
             'status' => $conta['status'],
             'banco' => $conta['banco'],
             'categoria' => $conta['categoria'],
+            'vencimento' => $conta['vencimento'],
         ];
-
         DB::table('contasHistorico')->insert($data);
     }
 
@@ -126,6 +126,7 @@ class Financa extends Model
             'status' => $conta['status'],
             'banco' => $conta['banco'],
             'categoria' => $conta['categoria'],
+            'vencimento' => $conta['vencimento'],
         ];
 
         $id = (int) $conta['id'];
@@ -143,8 +144,7 @@ class Financa extends Model
     {
         $results = DB::table('contas as c')
             ->where('c.id','=', $id)
-            ->first();
-
+        ->first();
         return $results;
     }
 
@@ -190,7 +190,6 @@ class Financa extends Model
             'banco' => $credito['banco'],
             'categoria' => $credito['categoria'],
         ];
-
         DB::table('creditosHistorico')->insert($data);
     }
 
@@ -222,8 +221,7 @@ class Financa extends Model
     {
         $results = DB::table('creditos as c')
             ->where('c.id','=', $id)
-            ->first();
-
+        ->first();
         return $results;
     }
 
@@ -261,7 +259,6 @@ class Financa extends Model
         $results->leftJoin('categorias as cc', 'c.categoria', '=', 'cc.categoria_id');
 
         $results->orderBy('data_termino_recorrente');
-
         return $results->get()->toArray();
     }
 
@@ -294,7 +291,6 @@ class Financa extends Model
         $results->leftJoin('categorias as cc', 'c.categoria', '=', 'cc.categoria_id');
 
         $results->orderBy('data_termino_recorrente');
-        // dd($results->toSql());
         return $results->get()->toArray();
     }
 
@@ -326,18 +322,26 @@ class Financa extends Model
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
         $count = DB::table($tabela.' as c')
-            ->where('c.recorrente', 1)
             ->where(function($query) use ($firstDayOfMonth, $lastDayOfMonth) {
-                $query->where('c.data_termino_recorrente', '>=', $firstDayOfMonth)
+                $query->where('c.recorrente', 1)
+                    ->where('c.data_termino_recorrente', '>=', $firstDayOfMonth)
                     ->where('c.data_termino_recorrente', '<=', $lastDayOfMonth);
             })
             ->orWhere(function($query) use ($firstDayOfMonth, $lastDayOfMonth) {
-                $query->where('c.recorrente', 0)
+                $query->where('c.recorrente', 2)
                     ->where('c.data', '>=', $firstDayOfMonth)
                     ->where('c.data', '<=', $lastDayOfMonth);
             })
-            ->count();
-
+        ->count();
         return $count;
+    }
+
+    public static function obterContasPorVencimentoEStatus($dataVencimento)
+    {
+        $registros = DB::table('contas')
+            ->where('vencimento', '=', $dataVencimento)
+            ->where('status', '=', 1)
+        ->get();
+        return $registros;
     }
 }

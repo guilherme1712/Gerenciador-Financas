@@ -19,6 +19,7 @@ class Admin
             'categoria_id' => $data['categoria_id'],
             'nome' => $data['nome'],
             'secao' => $data['secao'],
+            'ativo' => $data['ativo'],
             'created_at' => date('Y-m-d H:i:s'),
         ];
 
@@ -37,7 +38,7 @@ class Admin
         return DB::table('categorias')->find($id);
     }
 
-    
+
     public static function deleteCategoria($id)
     {
         return DB::table('categorias')->where('id', $id)->delete();

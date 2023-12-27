@@ -34,7 +34,8 @@ class AdminController extends Controller
         $request->validate([
             'categoria_id' => 'nullable|integer',
             'nome' => 'required|string',
-            'secao' => 'required|string',
+            'secao' => 'required|in:1,2,',
+            'ativo' => 'required|in:0,1,',
         ]);
 
         // Criação da categoria
@@ -54,13 +55,15 @@ class AdminController extends Controller
         $request->validate([
             'categoria_id' => 'required|string',
             'nome' => 'required|string',
-            'secao' => 'required|in:1,2', // Ajuste conforme necessário
+            'secao' => 'required|in:1,2',
+            'ativo' => 'required|in:0,1,',
         ]);
 
         $formData = [
             'categoria_id' => $request->input('categoria_id'),
             'nome' => $request->input('nome'),
             'secao' => $request->input('secao'),
+            'ativo' => $request->input('ativo'),
         ];
 
         $this->admin->updateCategoria($id, $formData);
