@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use Carbon\Carbon;
+use App\Jobs\CalcularSaldoMensal;
 use App\Jobs\CriarFaturaCartaoCreditoJob;
 use Illuminate\Console\Scheduling\Schedule;
 use App\Jobs\verificarRegistrosEmailContasJob;
@@ -19,6 +21,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->job(new verificarRegistrosEmailContasJob())->everyFiveMinutes();
         $schedule->job(new CriarFaturaCartaoCreditoJob())->everyFiveMinutes();
+        $schedule->job(new CalcularSaldoMensal())->everyMinute();
+        // $schedule->job(new \App\Jobs\CalcularSaldoMensal)->monthlyOn(Carbon::now()->endOfMonth()->day);
     }
 
     /**
@@ -29,7 +33,6 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         $this->load(__DIR__.'/Commands');
-
         require base_path('routes/console.php');
     }
 }

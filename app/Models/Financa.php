@@ -27,7 +27,7 @@ class Financa extends Model
             });
         }
 
-        $results = $results->where('cc.secao', '=', 1)->where('cc.ativo', '!=', 0)->orderBy('c.data_termino_recorrente')->get();
+        $results = $results->where('cc.secao', '=', 1)->where('cc.ativo', '!=', 0)->orderBy('c.vencimento')->get();
 
         return $results->toArray();
     }
@@ -294,7 +294,7 @@ class Financa extends Model
         return $results->get()->toArray();
     }
 
-    public function searchContasCreditosData(string $tabela, bool $isCount = false)
+    public function searchContasCreditosData(string $tabela)
     {
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
@@ -343,5 +343,38 @@ class Financa extends Model
             ->where('status', '=', 1)
         ->get();
         return $registros;
+    }
+
+    public function searchNubankCreditos()
+    {
+        // Realiza a consulta na tabela de contas
+        $contasBanco = DB::table('contas')
+            ->where('descricao', 'like', '%BANK%')
+            ->get()
+        ->toArray();
+
+        // Calcula a soma do valor da coluna 'valor' para a tabela de contas
+        $somaContas = array_sum(array_column($contasBanco, 'valor'));
+
+        // Realiza a consulta na tabela de creditos onde banco = 2
+        $creditosBanco2 = DB::table('creditos')
+            ->where('banco', '=', 2)
+            ->get()
+        ->toArray();
+
+        // Calcula a soma do valor da coluna 'valor' para a tabela de creditos
+        $somaCreditos = array_sum(array_column($creditosBanco2, 'valor'));
+
+        return $somaContas + $somaCreditos;
+    }
+
+    public function getTotalMes()
+    {
+        $mesPassado = Carbon::now()->subMonth()->format('Y-m');
+        $totalMesPassado = DB::table('totalMes')
+            ->where('mes_referencia', '=', $mesPassado)
+        ->first();
+
+        return $totalMesPassado;
     }
 }

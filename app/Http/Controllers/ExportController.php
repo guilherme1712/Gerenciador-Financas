@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Financa;
+use App\Models\FaturaCartaoCredito;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -39,6 +40,7 @@ class ExportController extends Controller
         $sheet = $spreadsheet->createSheet();
 
         $financa = new Financa();
+        $faturaCartaoCredito = new FaturaCartaoCredito();
         $contasData = $financa->searchBillings();
         $creditosData = $financa->searchCreditos();
 
@@ -49,7 +51,7 @@ class ExportController extends Controller
         foreach ($contasData as $row) {
             $sheet->getStyle('D')->getNumberFormat()->setFormatCode($this->getCurrencyFormat());
             $banco = $row->banco;
-            $vencimento = date('d/m', strtotime($row->vencimento));
+            $vencimento = date('d', strtotime($row->vencimento));
             $descricao = strval($row->descricao);
             $valor = strval($row->valor);
 
@@ -92,6 +94,13 @@ class ExportController extends Controller
                 $totalEntradas2Q += $valorCredito;
             }
         }
+        $totalEntradasNubank = $financa->searchNubankCreditos();
+        $fatura = $faturaCartaoCredito->getFaturaMesAtual()[0];
+
+        $sheet->setCellValue("I6", $fatura->dia_vencimento);
+        $sheet->setCellValue("J6", "Fat. Crédito");
+        $sheet->setCellValue("K6", $fatura->valor);
+        $sheet->getStyle("I6:K6")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $this->addHeaders($sheet, 3, 'A');
         $this->addHeaders($sheet, 3, 'E');
@@ -100,7 +109,6 @@ class ExportController extends Controller
         foreach (range('A', $sheet->getHighestColumn()) as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
-
         $sheet->getStyle('A1:' . $sheet->getHighestColumn() . $sheet->getHighestRow())
             ->getAlignment()
         ->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -124,6 +132,11 @@ class ExportController extends Controller
         $sheet->setCellValue("C4", 0);
         $sheet->getStyle("A4:C4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
+        $sheet->setCellValue("I4", "----");
+        $sheet->setCellValue("J4", "Inicial");
+        $sheet->setCellValue("K4", 0);
+        $sheet->getStyle("I4:K4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
         $rowIndex++;
         $sheet->setCellValue("A$rowIndex", "----");
         $sheet->setCellValue("B$rowIndex", "Saídas");
@@ -138,6 +151,13 @@ class ExportController extends Controller
         $sheet->getStyle("G4:G".$sheet->getHighestRow())->getNumberFormat()->setFormatCode($currencyFormat);
         $sheet->getStyle("E$rowIndex:G$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("E$rowIndex:G$rowIndex")->applyFromArray($styleYellow);
+
+        $sheet->setCellValue("I$rowIndex", "----");
+        $sheet->setCellValue("J$rowIndex", "Saídas");
+        $sheet->setCellValue("K$rowIndex", '=SUM(K6:K' . ($sheet->getHighestRow() - 1) . ')');
+        $sheet->getStyle("K4:K".$sheet->getHighestRow())->getNumberFormat()->setFormatCode($currencyFormat);
+        $sheet->getStyle("I$rowIndex:K$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("I$rowIndex:K$rowIndex")->applyFromArray($styleYellow);
 
         $rowIndex++;
         $sheet->setCellValue("A$rowIndex", "----");
@@ -154,6 +174,13 @@ class ExportController extends Controller
         $sheet->getStyle("E$rowIndex:G$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("E$rowIndex:G$rowIndex")->applyFromArray($greenStyle);
 
+        $sheet->setCellValue("I$rowIndex", "----");
+        $sheet->setCellValue("J$rowIndex", "Entradas");
+        $sheet->setCellValue("K$rowIndex", '0');
+        $sheet->getStyle("K$rowIndex")->getNumberFormat()->setFormatCode($currencyFormat);
+        $sheet->getStyle("I$rowIndex:K$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("I$rowIndex:K$rowIndex")->applyFromArray($greenStyle);
+
         $rowIndex++;
         $sheet->setCellValue("A$rowIndex", now()->startOfMonth()->addDays(14)->format('d'));
         $sheet->setCellValue("B$rowIndex", "Final");
@@ -161,11 +188,18 @@ class ExportController extends Controller
         $sheet->getStyle("C$rowIndex")->getNumberFormat()->setFormatCode($currencyFormat);
         $sheet->getStyle("A$rowIndex:C$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->setCellValue("E$rowIndex", now()->startOfMonth()->addDays(14)->format('d'));
+        $sheet->setCellValue("E$rowIndex", now()->endOfMonth()->format('d'));
         $sheet->setCellValue("F$rowIndex", "Final");
         $sheet->setCellValue("G$rowIndex", '=G4+G5-G'.($sheet->getHighestRow() - 2) . '+G'.($sheet->getHighestRow() - 1));
         $sheet->getStyle("G$rowIndex")->getNumberFormat()->setFormatCode($currencyFormat);
         $sheet->getStyle("E$rowIndex:G$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setCellValue("I$rowIndex", now()->endOfMonth()->format('d'));
+        $sheet->setCellValue("J$rowIndex", "Final");
+        $sheet->setCellValue("K$rowIndex", '=K4+K5-K'.($sheet->getHighestRow() - 2) . '+K'.($sheet->getHighestRow() - 1));
+        $sheet->getStyle("K$rowIndex")->getNumberFormat()->setFormatCode($currencyFormat);
+        $sheet->getStyle("I$rowIndex:K$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        // $sheet->getStyle('L1:L'. $sheet->getHighestRow())->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('00B0F0');
 
         $sheet->setCellValue("E4", "----");
         $sheet->setCellValue("F4", "Inicial");
@@ -173,28 +207,32 @@ class ExportController extends Controller
         $sheet->getStyle("A4:C4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->setCellValue("A5", now()->startOfMonth()->format('d'));
-        $sheet->setCellValue("B5", "entrada");
-        $sheet->getStyle("A5:B5")->applyFromArray($greenStyle);
+        $sheet->setCellValue("B5", "Entrada");
+        $sheet->getStyle("A5:C5")->applyFromArray($greenStyle);
         $sheet->setCellValue("C5", $totalEntradas1Q);
         $sheet->getStyle("C5")->getNumberFormat()->setFormatCode($currencyFormat);
-        $sheet->getStyle("C5")->applyFromArray($greenStyle);
 
         $sheet->setCellValue("E5", now()->startOfMonth()->addDays(15)->format('d'));
         $sheet->setCellValue("F5", "Entrada");
-        $sheet->getStyle("E5:F5")->applyFromArray($greenStyle);
+        $sheet->getStyle("E5:G5")->applyFromArray($greenStyle);
         $sheet->setCellValue("G5", $totalEntradas2Q);
         $sheet->getStyle("G5")->getNumberFormat()->setFormatCode($currencyFormat);
-        $sheet->getStyle("G5")->applyFromArray($greenStyle);
+
+        $sheet->setCellValue("I5", now()->startOfMonth()->format('d'));
+        $sheet->setCellValue("J5", "Entrada");
+        $sheet->getStyle("I5:K5")->applyFromArray($greenStyle);
+        $sheet->setCellValue("K5", $totalEntradasNubank);
+        $sheet->getStyle("K5")->getNumberFormat()->setFormatCode($currencyFormat);
 
         $sheet->mergeCells('A1:G1');
         $sheet->setCellValue('A1', 'BRADESCO');
         $sheet->getStyle('A1:G1')->getFont()->setSize(20)->setBold(true)->setColor(new Color('FF0000'));
         $sheet->getStyle('H1:H'.$sheet->getHighestRow())->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('00B0F0');
 
-        $sheet->mergeCells('I1:L1');
+        $sheet->mergeCells('I1:K1');
         $sheet->setCellValue('I1', 'NUBANK');
-        $sheet->getStyle('I1:L1')->getFont()->setSize(20)->setBold(true)->setColor(new Color('FF0000'));
-        $sheet->getStyle('I1:L1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('I1:K1')->getFont()->setSize(20)->setBold(true)->setColor(new Color('FF0000'));
+        $sheet->getStyle('I1:K1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->mergeCells('A2:C2');
         $sheet->getStyle('A2:C2')->getFont()->setSize(14)->setBold(true)->setColor(new Color('000000'));
@@ -211,14 +249,11 @@ class ExportController extends Controller
         $sheet->getStyle('E2:G2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF00'); // Amarelo
         $sheet->setCellValue('E2', '2ª QUINZENA');
 
-        $sheet->mergeCells('I2:L2');
-        $sheet->getStyle('I2:L2')->getFont()->setSize(14)->setBold(true)->setColor(new Color('000000'));
-        $sheet->getStyle('I2:L2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('I2:L2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF00'); // Amarelo
+        $sheet->mergeCells('I2:K2');
+        $sheet->getStyle('I2:K2')->getFont()->setSize(14)->setBold(true)->setColor(new Color('000000'));
+        $sheet->getStyle('I2:K2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('I2:K2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF00'); // Amarelo
         $sheet->setCellValue('I2', '1ª QUINZENA/2ª QUINZENA');
-
-        $sheet->setCellValue('L2', '');
-        $sheet->getStyle('L2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF00'); // Amarelo
 
         $this->addHeaders($sheet, 3, 'A');
         $this->addHeaders($sheet, 3, 'E');

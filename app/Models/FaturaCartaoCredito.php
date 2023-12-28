@@ -63,8 +63,7 @@ class FaturaCartaoCredito
 
     public function getAllFaturas()
     {
-        return DB::table('faturas_cartao_credito')
-            ->get();
+        return DB::table('faturas_cartao_credito')->get();
     }
 
     public function salvarManualmente($valor, $diaVencimento, $mesReferencia, $status)
@@ -82,5 +81,13 @@ class FaturaCartaoCredito
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    public function getFaturaMesAtual()
+    {
+        $results = DB::table('faturas_cartao_credito')
+            ->where('mes_referencia', '=', now()->format('Y-m'));
+
+        return $results->get();
     }
 }

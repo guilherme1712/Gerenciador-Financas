@@ -20,10 +20,11 @@ class FinancasController extends Controller
     {
         $contas = $this->financa->searchBillings();
         $creditos = $this->financa->searchCreditos();
+        $mesPassado = $this->financa->getTotalMes();
 
         $totalContas = array_sum(array_column($contas, 'valor'));
         $totalCreditos = array_sum(array_column($creditos, 'valor'));
-        $totalMes = ($totalCreditos - $totalContas);
+        $totalMes = ($totalCreditos - $totalContas) + $mesPassado;
 
         return view('financas.index', compact('totalContas', 'totalCreditos', 'totalMes'));
     }
@@ -70,7 +71,6 @@ class FinancasController extends Controller
     {
         if ($request->isMethod('post')) {
             $data = $request->input();
-
 
             if ($data['recorrente'] == 0) {
                 $data['recorrente'] = 2;

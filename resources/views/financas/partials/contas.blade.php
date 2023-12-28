@@ -13,12 +13,12 @@
     <tbody>
         @foreach($contas as $conta)
             <tr>
-                <td>{{ date('d/m/Y', strtotime($conta->data )) }}</td>
+                <td>{{ date('d/m/Y', strtotime($conta->vencimento )) }}</td>
                 <td>
                     <a>{{ $conta->descricao }}</a >
                 </td>
                 <td class="col-md-auto">R$ {{ number_format($conta->valor, 2, ',', '.') }}</td>
-                <td>{{ $conta->recorrente ? 'Sim' : 'Não' }}</td>
+                <td>{{ $conta->recorrente == 1 ? 'Sim' : 'Não' }}</td>
                 <td>{{ date('d/m/Y', strtotime($conta->data_termino_recorrente )) }}</td>
                 <td>{{ $conta->status == 1 ? 'Pago' : 'Não Pago' }}</td>
                 <td>
