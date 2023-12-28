@@ -96,6 +96,7 @@ class ExportController extends Controller
         }
         $totalEntradasNubank = $financa->searchNubankCreditos();
         $fatura = $faturaCartaoCredito->getFaturaMesAtual()[0];
+        $saldoMesPassado = $financa->getTotalMes();
 
         $sheet->setCellValue("I6", $fatura->dia_vencimento);
         $sheet->setCellValue("J6", "Fat. Crédito");
@@ -129,7 +130,7 @@ class ExportController extends Controller
 
         $sheet->setCellValue("A4", "----");
         $sheet->setCellValue("B4", "Inicial");
-        $sheet->setCellValue("C4", 0);
+        $sheet->setCellValue("C4", $saldoMesPassado);
         $sheet->getStyle("A4:C4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->setCellValue("I4", "----");

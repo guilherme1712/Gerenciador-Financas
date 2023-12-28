@@ -370,10 +370,9 @@ class Financa extends Model
     public function getTotalMes()
     {
         $mesPassado = Carbon::now()->subMonth()->format('Y-m');
-        $totalMesPassado = DB::table('totalMes')
+        return DB::table('totalMes')
             ->where('mes_referencia', '=', $mesPassado)
         ->first();
-        return $totalMesPassado;
     }
 
     public function calcularSaldoMes()
