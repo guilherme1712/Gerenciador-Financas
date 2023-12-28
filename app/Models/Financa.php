@@ -364,7 +364,6 @@ class Financa extends Model
 
         // Calcula a soma do valor da coluna 'valor' para a tabela de creditos
         $somaCreditos = array_sum(array_column($creditosBanco2, 'valor'));
-
         return $somaContas + $somaCreditos;
     }
 
@@ -374,7 +373,25 @@ class Financa extends Model
         $totalMesPassado = DB::table('totalMes')
             ->where('mes_referencia', '=', $mesPassado)
         ->first();
-
         return $totalMesPassado;
+    }
+
+    public function calcularSaldoMes()
+    {
+        $firstDayOfMonth = now()->startOfMonth()->toDateString();
+        $lastDayOfMonth = now()->endOfMonth()->toDateString();
+
+        $creditos = DB::table('creditos')->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
+        $contas = DB::table('contas')->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
+        return $creditos - $contas;
+    }
+
+    public function salvarSaldoNoTotalMes($saldo)
+    {
+        $mesReferencia = now()->format('Y-m');
+        return DB::table('totalMes')->updateOrInsert(
+            ['mes_referencia' => $mesReferencia],
+            ['total_mes' => $saldo, 'created_at' => now()]
+        );
     }
 }

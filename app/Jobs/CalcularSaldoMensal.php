@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class CalcularSaldoMensal implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
+
     /**
      * Execute the job.
      *
@@ -22,33 +23,16 @@ class CalcularSaldoMensal implements ShouldQueue
     {
         $financa = new Financa();
         try {
-            $saldo = $this->calcularSaldo();
-            $this->salvarSaldoNoTotalMes($saldo);
+            $saldo = $financa->calcularSaldoMes();
+            $financa->salvarSaldoNoTotalMes($saldo);
 
             // Utiliza o saldo no início do próximo mês (exemplo)
             // Substitua esta parte com a lógica real de utilização do saldo no novo mês
             // Pode envolver transações, ajustes, etc.
             $saldoProximoMes = $saldo;
-            Log::info("Saldo calculado e salvo: $saldo. Saldo para o próximo mês: $saldoProximoMes");
+            Log::info("Job " . self::class . "executado às " . now()->toTimeString().". Saldo para o próximo mês: $saldoProximoMes");
         } catch (\Exception $e) {
             Log::error('Erro ao executar job CalcularSaldoMensal: ' . $e->getMessage());
         }
-    }
-
-    private function calcularSaldo()
-    {
-        $creditos = DB::table('creditos')->sum('valor');
-        $contas = DB::table('contas')->sum('valor');
-        return $creditos - $contas;
-    }
-
-    private function salvarSaldoNoTotalMes($saldo)
-    {
-        $mesReferencia = now()->format('Y-m');
-        DB::table('totalMes')->updateOrInsert(
-            ['mes_referencia' => $mesReferencia],
-            ['total_mes' => $saldo, 'created_at' => now()]
-        );
-        return true;
     }
 }

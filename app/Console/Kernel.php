@@ -21,8 +21,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->job(new verificarRegistrosEmailContasJob())->everyFiveMinutes();
         $schedule->job(new CriarFaturaCartaoCreditoJob())->everyFiveMinutes();
-        $schedule->job(new CalcularSaldoMensal())->everyMinute();
-        // $schedule->job(new \App\Jobs\CalcularSaldoMensal)->monthlyOn(Carbon::now()->endOfMonth()->day);
+        $schedule->job(new CalcularSaldoMensal())->everyFiveMinutes();
+        // $schedule->job(new CalcularSaldoMensal())->monthlyOn(Carbon::now()->endOfMonth()->day);
     }
 
     /**
