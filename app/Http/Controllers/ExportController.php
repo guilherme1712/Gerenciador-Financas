@@ -130,7 +130,7 @@ class ExportController extends Controller
 
         $sheet->setCellValue("A4", "----");
         $sheet->setCellValue("B4", "Inicial");
-        $sheet->setCellValue("C4", $saldoMesPassado);
+        $sheet->setCellValue("C4", $saldoMesPassado ?? 0);
         $sheet->getStyle("A4:C4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->setCellValue("I4", "----");
