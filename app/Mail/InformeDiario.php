@@ -3,26 +3,27 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Conta; // Certifique-se de importar o modelo Conta
 
-class Contas extends Mailable
+class InformeDiario extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $contas;
+    public $creditos;
 
     /**
      * Create a new message instance.
      *
-     * @param $contas
+     * @param array|string|null $contas
+     * @param array|string|null $creditos
      * @return void
      */
-    public function __construct($contas)
+    public function __construct($contas, $creditos)
     {
         $this->contas = $contas;
+        $this->creditos = $creditos;
     }
 
     /**
@@ -34,10 +35,10 @@ class Contas extends Mailable
     {
         $filePath = '/mnt/d/area de trabalho/CONTA_CORRENE.xlsx';
         $fileName = 'CONTA_CORRENE.xlsx';
-        $subjectSuffix = count($this->contas) === 1 ? '1 conta' : count($this->contas) . ' contas';
 
-        return $this->view('emails.contas')
-            ->subject('Contas a Pagar - ' . $subjectSuffix)
+        return $this->view('emails.informeDiario')
+            ->with(['contas' => $this->contas, 'creditos' => $this->creditos])
+            ->subject('Informe Diario ContaCorrente')
             ->from('testesmtp17@gmail.com', 'Laravel - ContaCorrente')
             ->attach($filePath, [
                 'as' => $fileName,

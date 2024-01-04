@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use Carbon\Carbon;
+use App\Jobs\InformeDiarioJob;
 use App\Jobs\CalcularSaldoMensal;
 use App\Jobs\CriarFaturaCartaoCreditoJob;
 use Illuminate\Console\Scheduling\Schedule;
@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new verificarRegistrosEmailContasJob())->everyFiveMinutes();
         $schedule->job(new CriarFaturaCartaoCreditoJob())->everyFiveMinutes();
         $schedule->job(new CalcularSaldoMensal())->everyFiveMinutes();
-        // $schedule->job(new CalcularSaldoMensal())->monthlyOn(Carbon::now()->endOfMonth()->day);
+        $schedule->job(new InformeDiarioJob())->everyFiveMinutes();
     }
 
     /**

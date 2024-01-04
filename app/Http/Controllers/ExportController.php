@@ -200,7 +200,6 @@ class ExportController extends Controller
         $sheet->setCellValue("K$rowIndex", '=K4+K5-K'.($sheet->getHighestRow() - 2) . '+K'.($sheet->getHighestRow() - 1));
         $sheet->getStyle("K$rowIndex")->getNumberFormat()->setFormatCode($currencyFormat);
         $sheet->getStyle("I$rowIndex:K$rowIndex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        // $sheet->getStyle('L1:L'. $sheet->getHighestRow())->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('00B0F0');
 
         $sheet->setCellValue("E4", "----");
         $sheet->setCellValue("F4", "Inicial");

@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\Contas;
+use App\Mail\InformeDiario;
 use App\Models\Financa;
 use Illuminate\Http\Request;
 use Webklex\IMAP\Facades\Client;
@@ -27,6 +28,26 @@ class EmailController
         try {
             Mail::to($to)->send($contasMailable);
             return "E-mail de Contas enviado com sucesso!";
+        } catch (\Exception $e) {
+            return "Falha ao enviar o e-mail de Contas. Detalhes: " . $e->getMessage();
+        }
+    }
+
+    public function enviarEmailInformeDiario()
+    {
+        $financaModel = new Financa();
+        $contas = $financaModel->searchBillings();
+        $creditos = $financaModel->searchCreditos();
+
+        $informeDiarioMailable = new InformeDiario($contas, $creditos);
+        
+        $to = 'gdaudt17@gmail.com';
+        $subject = $informeDiarioMailable->subject;
+        $body = $informeDiarioMailable->render();
+
+        try {
+            Mail::to($to)->send($informeDiarioMailable);
+            return "Informe diario e-mail enviado com sucesso!";
         } catch (\Exception $e) {
             return "Falha ao enviar o e-mail de Contas. Detalhes: " . $e->getMessage();
         }

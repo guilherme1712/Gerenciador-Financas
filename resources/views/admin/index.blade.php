@@ -42,6 +42,10 @@
         </div>
 
         <div class="mb-4">
+            <a href="{{ route('testarInformeDiario') }}" class="btn btn-secondary">Teste enviar email informe fiario</a>
+        </div>
+
+        <div class="mb-4">
             <a href="{{ route('testarCriarFatura') }}" class="btn btn-secondary">Teste criar faturas</a>
         </div>
 

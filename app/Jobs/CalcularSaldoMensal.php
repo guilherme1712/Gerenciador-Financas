@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\Financa;
+use App\Models\JobEstado;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -26,13 +26,11 @@ class CalcularSaldoMensal implements ShouldQueue
             $saldo = $financa->calcularSaldoMes();
             $financa->salvarSaldoNoTotalMes($saldo);
 
-            // Utiliza o saldo no início do próximo mês (exemplo)
-            // Substitua esta parte com a lógica real de utilização do saldo no novo mês
-            // Pode envolver transações, ajustes, etc.
+            JobEstado::create(['executado' => true, 'created_at' => now(), 'jobname' => self::class]);
             $saldoProximoMes = $saldo;
             Log::info("Job " . self::class . "executado às " . now()->toTimeString().". Saldo para o próximo mês: $saldoProximoMes");
         } catch (\Exception $e) {
-            Log::error('Erro ao executar job CalcularSaldoMensal: ' . $e->getMessage());
+            Log::error("Erro ao executar job " . self::class . $e->getMessage());
         }
     }
 }

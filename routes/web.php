@@ -14,10 +14,6 @@ Route::get("/", function () {
     return view('menu.index');
 })->name('home');
 
-Route::get('/menu', function () {
-    return view('menu.index');
-})->name('menu');
-
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::match(['get', 'post'], '/register-form', [AuthController::class, 'showRegistrationForm'])->name('register.form');
@@ -25,6 +21,10 @@ Route::match(['get', 'post'], '/register', [AuthController::class, 'register'])-
 
 Route::prefix('/financas')->group(function () {
     Route::get('/', [FinancasController::class, 'index'])->name('financas.index');
+
+    Route::get('/menu', function () {
+        return view('menu.index');
+    })->name('menu');
 
     Route::get('/admin', function () {
         return view('admin.index');
@@ -88,8 +88,9 @@ Route::prefix('/financas')->group(function () {
             FaturaCartaoCredito::criarFatura();
             return 'Função criarFatura executada com sucesso.';
         })->name('testarCriarFatura');
-        Route::get('/testar-envio-email',[FinancasController::class, 'verificarRegistrosEmailContas'])
-            ->name('verificarRegistrosEmailContas');
+        Route::get('/testar-envio-email',[FinancasController::class, 'verificarRegistrosEmailContas'])->name('verificarRegistrosEmailContas');
+
+        Route::get('/testar-informeDiario',[EmailController::class, 'enviarEmailInformeDiario'])->name('testarInformeDiario');
     });
 
     Route::get('/export-excel', [ExportController::class, 'exportToExcel'])->name('exportToExcel');
