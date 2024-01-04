@@ -13,7 +13,7 @@
     <tbody>
         @foreach($creditos as $credito)
         <tr>
-                <td>{{ date('d/m/Y', strtotime($credito->data )) }}</td>
+        <td>{{ $credito->recorrente == 1 ? date('d/m/Y', strtotime($credito->data_termino_recorrente )) : date('d/m/Y', strtotime($credito->vencimento )) }}</td>
                 <td>{{ $credito->descricao }}</td>
                 <td>R$ {{ number_format($credito->valor, 2, ',', '.') }}</td>
                 <td>{{ $credito->recorrente ? 'Sim' : 'Não' }}</td>

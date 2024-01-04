@@ -13,7 +13,7 @@
     <tbody>
         @foreach($contas as $conta)
             <tr>
-                <td>{{ date('d/m/Y', strtotime($conta->vencimento )) }}</td>
+                <td>{{ $conta->recorrente == 1 ? date('d/m/Y', strtotime($conta->data_termino_recorrente )) : date('d/m/Y', strtotime($conta->vencimento )) }}</td>
                 <td>
                     <a>{{ $conta->descricao }}</a >
                 </td>

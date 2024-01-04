@@ -49,6 +49,10 @@
             <a href="{{ route('exportToExcel') }}" class="btn btn-secondary">Gerar exel contas do mês</a>
         </div>
 
+        <div style="margin-top: 50px; align-self: center;">
+            <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/register-form">Registrar Usuário</a>
+        </div>
+
         <!-- Conteúdo principal da página -->
         <div class="card">
             <div class="card-body">

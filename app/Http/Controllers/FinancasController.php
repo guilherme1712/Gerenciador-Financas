@@ -20,7 +20,7 @@ class FinancasController extends Controller
     {
         $contas = $this->financa->searchBillings();
         $creditos = $this->financa->searchCreditos();
-        $mesPassado = $this->financa->getTotalMes();
+        $mesPassado = $this->financa->getTotalMes()->total_mes;
 
         $totalContas = array_sum(array_column($contas, 'valor'));
         $totalCreditos = array_sum(array_column($creditos, 'valor'));

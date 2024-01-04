@@ -2,6 +2,7 @@
 
 use App\Models\FaturaCartaoCredito;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ExportController;
@@ -16,6 +17,11 @@ Route::get("/", function () {
 Route::get('/menu', function () {
     return view('menu.index');
 })->name('menu');
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::match(['get', 'post'], '/register-form', [AuthController::class, 'showRegistrationForm'])->name('register.form');
+Route::match(['get', 'post'], '/register', [AuthController::class, 'register'])->name('register');
 
 Route::prefix('/financas')->group(function () {
     Route::get('/', [FinancasController::class, 'index'])->name('financas.index');
@@ -89,4 +95,3 @@ Route::prefix('/financas')->group(function () {
     Route::get('/export-excel', [ExportController::class, 'exportToExcel'])->name('exportToExcel');
 
 });
-
