@@ -44,22 +44,6 @@
         </div>
     </div>
 
-
-
-
-
-    <!-- <div style="margin-top: 20px;">
-        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/addCredito">Adicionar Novo Crédito</a>
-    </div> -->
-
-    <!-- <div style="margin-top: 20px;">
-        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/buscaListadoContas">Histórico de Contas</a>
-    </div>
-
-    <div style="margin-top: 20px;">
-        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/buscaListadoCreditos">Histórico de Créditos</a> -->
-    <!-- </div> -->
-
     <div style="margin-top: 20px;">
         <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/faturas">Fatura Cartão de Credito</a>
     </div>
@@ -71,6 +55,11 @@
     <div style="margin-top: 50px; align-self: center;">
         <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/admin">Administrar</a>
     </div>
+
+    <div style="margin-top: 50px; align-self: center;">
+        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/login">Logout</a>
+    </div>
+
 </div>
 
 

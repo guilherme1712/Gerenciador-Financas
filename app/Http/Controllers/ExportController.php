@@ -96,7 +96,7 @@ class ExportController extends Controller
         }
         $totalEntradasNubank = $financa->searchNubankCreditos();
         $fatura = $faturaCartaoCredito->getFaturaMesAtual()[0];
-        $saldoMesPassado = $financa->getTotalMes();
+        $saldoMesPassado = $financa->getTotalMes()->total_mes;
 
         $sheet->setCellValue("I6", $fatura->dia_vencimento);
         $sheet->setCellValue("J6", "Fat. Crédito");

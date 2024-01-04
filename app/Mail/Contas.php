@@ -36,6 +36,6 @@ class Contas extends Mailable
 
         return $this->view('emails.contas')
             ->subject('Contas a Pagar - ' . $subjectSuffix)
-            ->from('testesmtp17@gmail.com', 'Laravel - ContaCrrente');
+            ->from('testesmtp17@gmail.com', 'Laravel - ContaCorrente');
     }
 }
