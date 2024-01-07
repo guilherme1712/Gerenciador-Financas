@@ -27,7 +27,11 @@
 </style>
 
 <div class="content d-flex flex-column align-items-center">
-
+    <div class="user-image">
+        @if(Auth::user()->image_path)
+            <img src="{{ asset(Auth::user()->image_path) }}" style="width: 50px; height: 50px; border-radius: 50%;">
+        @endif
+    </div>
     <div class="btn-group" style="margin-top: 20px;">
         Olá, {{ app('redis')->get('userName') }}
     </div>

@@ -53,14 +53,25 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
-        return redirect()->route('login');
+
+
+        if ($request->hasFile('image')) {
+            $imageName = $request->file('image')->getClientOriginalName();
+            $request->file('image')->storeAs('img/user_images', $imageName);
+            $imagePath = "/img/user_images/$imageName";
+
+            $user->image_path = $imagePath;
+            $user->save();
+        }
+        return redirect()->route('login')->with('success', 'Usuário registrado com sucesso! Faça o login para continuar.');
     }
 
     // public function reset(Request $request) //TODO:fazer funcionar reset senha
