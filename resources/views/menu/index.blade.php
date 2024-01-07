@@ -29,6 +29,10 @@
 <div class="content d-flex flex-column align-items-center">
 
     <div class="btn-group" style="margin-top: 20px;">
+        Olá, {{ app('redis')->get('userName') }}
+    </div>
+
+    <div class="btn-group" style="margin-top: 20px;">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Adicionar</button>
         <div class="dropdown-menu">
             <a class="dropdown-item" href="{{ url('/financas/contas/addConta') }}">Adicionar Nova Conta</a>

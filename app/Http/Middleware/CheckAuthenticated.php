@@ -9,10 +9,24 @@ class CheckAuthenticated
 {
     public function handle($request, Closure $next)
     {
+        $inputs = $request->all();
+        array_walk_recursive($inputs, function (&$value) {
+            $value = $this->cleanInput($value);
+        });
+
+        $request->merge($inputs);
+
         if (Auth::check()) {
             return $next($request);
         }
 
         return redirect('/login');
+    }
+
+    private function cleanInput($value)
+    {
+        $value = strip_tags($value);
+        $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        return $value;
     }
 }

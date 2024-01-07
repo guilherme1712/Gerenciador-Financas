@@ -23,7 +23,6 @@ Route::prefix('/financas')->middleware('auth.check')->group(function () {
 
     Route::get('/menu', function () { return view('menu.index'); })->name('menu');
 
-
     Route::get('/export-excel', [ExportController::class, 'exportToExcel'])->name('exportToExcel');
     Route::post('/contasCreditosCount', [FinancasController::class, 'getContasCreditosCount'])->name('financas.contasCreditosCount');
     Route::get('/ajaxGetContas', [FinancasController::class, 'ajaxGetContas'])->name('financas.getContas');

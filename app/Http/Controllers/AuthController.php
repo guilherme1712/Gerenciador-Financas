@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -17,6 +18,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $user = new User();
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -26,6 +28,8 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remenber)) {
             $request->session()->regenerate();
+            Redis::set('userEmail', $credentials['email']);
+            Redis::set('userName', $user->getUserName($credentials['email']));
 
             Session::put([
                 'userEmail' => $credentials['email'],
@@ -51,15 +55,11 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Lógica de criação do usuário
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
-
-        // Outras operações, se necessário
-
         return redirect()->route('login');
     }
 

@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Session;
 
 class Financa extends Model
 {
@@ -13,7 +13,7 @@ class Financa extends Model
     public function searchBillings(int $id = null, bool $detalhes = false): array
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
@@ -38,7 +38,7 @@ class Financa extends Model
     public function searchCreditos(int $id = null, bool $detalhes = false): array
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
@@ -79,7 +79,7 @@ class Financa extends Model
     public function saveConta(array $conta)
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $data = [
@@ -110,7 +110,7 @@ class Financa extends Model
     public function saveContaHistorico(array $conta)
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $data = [
@@ -167,7 +167,7 @@ class Financa extends Model
     public function saveCredito(array $credito)
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $data = [
@@ -196,7 +196,7 @@ class Financa extends Model
     public function saveCreditoHistorico(array $credito)
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $data = [
@@ -251,7 +251,7 @@ class Financa extends Model
     public function getListadoContas(array $formData): array
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $results = DB::table('contasHistorico as c');
@@ -287,7 +287,7 @@ class Financa extends Model
     public function getListadoCreditos(array $formData): array
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $results = DB::table('creditosHistorico as c');
@@ -323,7 +323,7 @@ class Financa extends Model
     public function searchContasCreditosData(string $tabela)
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
@@ -350,7 +350,7 @@ class Financa extends Model
     public function countContasCreditos(string $tabela)
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
@@ -375,7 +375,7 @@ class Financa extends Model
     public static function obterContasPorVencimentoEStatus($dataVencimento)
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $registros = DB::table('contas')
@@ -389,13 +389,12 @@ class Financa extends Model
     public function searchNubankCreditos()
     {
         $uid = DB::table('users')
-            ->where('email', '=', Session::get('userEmail'))
+            ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
 
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
-        // Realiza a consulta na tabela de contas
         $contasBanco = DB::table('contas')
             ->where('descricao', 'like', '%BANK%')
             ->where('uid', '=', $uid)
@@ -403,10 +402,7 @@ class Financa extends Model
             ->get()
         ->toArray();
 
-        // Calcula a soma do valor da coluna 'valor' para a tabela de contas
         $somaContas = array_sum(array_column($contasBanco, 'valor'));
-
-        // Realiza a consulta na tabela de creditos onde banco = 2
         $creditosBanco2 = DB::table('creditos')
             ->where('banco', '=', 2)
             ->where('uid', '=', $uid)
@@ -414,7 +410,6 @@ class Financa extends Model
             ->get()
         ->toArray();
 
-        // Calcula a soma do valor da coluna 'valor' para a tabela de creditos
         $somaCreditos = array_sum(array_column($creditosBanco2, 'valor'));
         return $somaContas + $somaCreditos;
     }
@@ -435,15 +430,15 @@ class Financa extends Model
         ->value('total_mes');
     }
 
-    public function calcularSaldoMes()
+    public function calcularSaldoMes(int $uid = null)
     {
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
-        $creditos = DB::table('creditos')->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
-        $contas = DB::table('contas')->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
+        $creditos = DB::table('creditos')->where('uid', '=', $uid)->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
+        $contas = DB::table('contas')->where('uid', '=', $uid)->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
 
-        $saldo = $creditos - $contas;
+        $saldo = ($creditos - $contas);
         $saldoFormatado = number_format($saldo, 2, '.', '');
         return $saldoFormatado;
     }

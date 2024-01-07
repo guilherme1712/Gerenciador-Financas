@@ -17,6 +17,7 @@
         "laravelcollective/html": "^6.4",
         "nesbot/carbon": "^2.72",
         "phpoffice/phpspreadsheet": "^1.12",
+        "predis/predis": "^2.2",
         "symfony/var-dumper": "^5.4",
         "webklex/laravel-imap": "^4.1"
     },

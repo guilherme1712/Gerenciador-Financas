@@ -6,7 +6,6 @@ use App\Models\Financa;
 use Illuminate\Http\Request;
 use App\Http\Requests\ContaRequest;
 use App\Http\Requests\CreditoRequest;
-use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\EmailController;
 
 class FinancasController extends Controller
