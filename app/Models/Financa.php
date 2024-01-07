@@ -380,7 +380,7 @@ class Financa extends Model
 
         $registros = DB::table('contas')
             ->where('vencimento', '=', $dataVencimento)
-            ->where('c.uid', '=', $uid)
+            ->where('uid', '=', $uid)
             ->where('status', '=', 1)
         ->get();
         return $registros;
