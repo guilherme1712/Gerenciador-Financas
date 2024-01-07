@@ -8,7 +8,7 @@
             <h2>Buscar Contas</h2>
         </div>
 
-        <form action="{{ route('financas.listadoCreditos') }}" method="post" class="mx-auto">
+        <form action="{{ route('financas.listadoContas') }}" method="post" class="mx-auto">
             @csrf
             <div class="form-group row">
                 <label for="dataDesde" class="col-md-2 col-form-label">Data Desde:</label>

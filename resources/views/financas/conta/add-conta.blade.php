@@ -7,7 +7,7 @@
         <div class="text-center">
             <h2>Adicionar Conta</h2>
         </div>
-        {!! Form::open(['url' => url('financas/saveConta'), 'method' => 'post']) !!}
+        {!! Form::open(['url' => url('financas/contas/saveConta'), 'method' => 'post']) !!}
 
             {{ Form::hidden('id', null) }}
 

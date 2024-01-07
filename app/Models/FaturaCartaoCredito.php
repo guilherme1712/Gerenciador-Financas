@@ -5,11 +5,16 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class FaturaCartaoCredito
 {
     public static function criarFatura()
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $ultimaFatura = DB::table('faturas_cartao_credito')
             ->orderBy('created_at', 'desc')
             ->first();
@@ -28,6 +33,7 @@ class FaturaCartaoCredito
             $dataFechamentoProximaFatura = $ultimaFatura->dia_fechamento;
 
             return DB::table('faturas_cartao_credito')->insertGetId([
+                'uid' => $uid,
                 'mes_referencia' => $mesReferenciaProximaFatura,
                 'valor' => 0,
                 'dia_fechamento' => $dataFechamentoProximaFatura,
@@ -63,16 +69,25 @@ class FaturaCartaoCredito
 
     public function getAllFaturas()
     {
-        return DB::table('faturas_cartao_credito')->get();
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
+        return DB::table('faturas_cartao_credito')->where('uid', '=', $uid)->get();
     }
 
     public function salvarManualmente($valor, $diaVencimento, $mesReferencia, $status)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $dataCompleta = date('Y-m', strtotime($mesReferencia)) . '-' . $diaVencimento;
         $diaVencimentoCarbon = Carbon::parse($dataCompleta);
         $dataFechamento = $diaVencimentoCarbon->subDays(7)->format('d');
 
         return DB::table('faturas_cartao_credito')->insertGetId([
+            'uid' => $uid,
             'mes_referencia' => $mesReferencia ?? now()->addMonth()->format('Y-m'),
             'valor' => $valor,
             'dia_fechamento' => $dataFechamento,

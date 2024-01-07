@@ -36,13 +36,17 @@ class InformeDiario extends Mailable
         $filePath = '/mnt/d/area de trabalho/CONTA_CORRENE.xlsx';
         $fileName = 'CONTA_CORRENE.xlsx';
 
-        return $this->view('emails.informeDiario')
+        $email = $this->view('emails.informeDiario')
             ->with(['contas' => $this->contas, 'creditos' => $this->creditos])
             ->subject('Informe Diario ContaCorrente')
-            ->from('testesmtp17@gmail.com', 'Laravel - ContaCorrente')
-            ->attach($filePath, [
+            ->from('testesmtp17@gmail.com', 'Laravel - ContaCorrente');
+
+        if (file_exists($filePath)) {
+            $email->attach($filePath, [
                 'as' => $fileName,
                 'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]);
+        }
+        return $email;
     }
 }

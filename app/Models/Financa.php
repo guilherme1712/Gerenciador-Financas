@@ -5,12 +5,17 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session;
 
 class Financa extends Model
 {
 
     public function searchBillings(int $id = null, bool $detalhes = false): array
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
@@ -26,17 +31,17 @@ class Financa extends Model
                 $query->whereBetween('c.data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth]);
             });
         }
-
-        $results = $results->where('cc.secao', '=', 1)->where('cc.ativo', '!=', 0)->orderBy('c.vencimento')->get();
-
+        $results = $results->where('cc.secao', '=', 1)->where('cc.ativo', '!=', 0)->where('c.uid', '=', $uid)->orderBy('c.vencimento')->get();
         return $results->toArray();
     }
 
     public function searchCreditos(int $id = null, bool $detalhes = false): array
     {
-        $today = now()->toDateString();
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
-        $middleOfMonth = now()->firstOfMonth()->addDays(15)->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
         $results = DB::table('creditos as c')
@@ -47,13 +52,11 @@ class Financa extends Model
         if ($detalhes) {
             $results->where('c.id', '=', $id);
         } else {
-            $results->where(function ($query) use ($firstDayOfMonth, $middleOfMonth) {
-                $query->whereBetween('c.data_termino_recorrente', [$firstDayOfMonth, $middleOfMonth]);
-            })->orWhere(function ($query) use ($middleOfMonth, $lastDayOfMonth) {
-                $query->whereBetween('c.data_termino_recorrente', [$middleOfMonth, $lastDayOfMonth]);
+            $results->where(function ($query) use ($firstDayOfMonth, $lastDayOfMonth) {
+                $query->whereBetween('c.data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth]);
             });
         }
-        $results = $results->where('cc.secao', '=', 2)->where('cc.ativo', '!=', 0)->orderBy('c.data_termino_recorrente')->get();
+        $results = $results->where('cc.secao', '=', 2)->where('cc.ativo', '!=', 0)->where('c.uid', '=', $uid)->orderBy('c.data_termino_recorrente')->get();
         return $results->toArray();
     }
 
@@ -75,7 +78,12 @@ class Financa extends Model
 
     public function saveConta(array $conta)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $data = [
+            'uid' => $uid,
             'data' => $conta['data'],
             'descricao' => ucwords(strtolower($conta['descricao'])),
             'valor' => $conta['valor'],
@@ -101,7 +109,12 @@ class Financa extends Model
 
     public function saveContaHistorico(array $conta)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $data = [
+            'uid' => $uid,
             'data' => $conta['data'],
             'descricao' => ucwords(strtolower($conta['descricao'])),
             'valor' => $conta['valor'],
@@ -130,9 +143,7 @@ class Financa extends Model
         ];
 
         $id = (int) $conta['id'];
-
         $updated = DB::table('contas')->where('id', $id)->update($data);
-
         if ($updated) {
             $this->saveContaHistorico($conta);
         } else {
@@ -155,7 +166,12 @@ class Financa extends Model
 
     public function saveCredito(array $credito)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $data = [
+            'uid' => $uid,
             'data' => $credito['data'],
             'descricao' => ucwords(strtolower($credito['descricao'])),
             'valor' => $credito['valor'],
@@ -167,7 +183,6 @@ class Financa extends Model
         ];
 
         $id = (int)$credito['id'];
-
         if ($id === 0) {
             $insertedId = DB::table('creditos')->insertGetId($data);
 
@@ -180,7 +195,12 @@ class Financa extends Model
 
     public function saveCreditoHistorico(array $credito)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $data = [
+            'uid' => $uid,
             'data' => $credito['data'],
             'descricao' => ucwords(strtolower($credito['descricao'])),
             'valor' => $credito['valor'],
@@ -207,9 +227,7 @@ class Financa extends Model
         ];
 
         $id = (int) $credito['id'];
-
         $updated = DB::table('creditos')->where('id', $id)->update($data);
-
         if ($updated) {
             $this->saveCreditoHistorico($credito);
         } else {
@@ -232,6 +250,10 @@ class Financa extends Model
 
     public function getListadoContas(array $formData): array
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $results = DB::table('contasHistorico as c');
         $results->select(['c.*', 'b.nome', 'cc.nome as nomeCategoria']);
 
@@ -254,7 +276,7 @@ class Financa extends Model
         if ($formData['categoria']) {
             $results->where('c.categoria', '=', $formData['categoria']);
         }
-        $results->where('cc.secao', '=', 1);
+        $results->where('cc.secao', '=', 1)->where('c.uid', '=', $uid);
         $results->leftJoin('bancos as b', 'c.banco', '=', 'b.id_banco');
         $results->leftJoin('categorias as cc', 'c.categoria', '=', 'cc.categoria_id');
 
@@ -264,6 +286,10 @@ class Financa extends Model
 
     public function getListadoCreditos(array $formData): array
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $results = DB::table('creditosHistorico as c');
         $results->select(['c.*', 'b.nome', 'cc.nome as nomeCategoria']);
 
@@ -286,7 +312,7 @@ class Financa extends Model
         if ($formData['categoria']) {
             $results->where('c.categoria', '=', $formData['categoria']);
         }
-        $results->where('cc.secao', '=', 2);
+        $results->where('cc.secao', '=', 2)->where('c.uid', '=', $uid);
         $results->leftJoin('bancos as b', 'c.banco', '=', 'b.id_banco');
         $results->leftJoin('categorias as cc', 'c.categoria', '=', 'cc.categoria_id');
 
@@ -296,6 +322,10 @@ class Financa extends Model
 
     public function searchContasCreditosData(string $tabela)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
@@ -303,6 +333,7 @@ class Financa extends Model
             ->select(['c.*', 'b.nome as nomeBanco', 'cc.nome as nomeCategoria'])
             ->leftJoin('bancos as b', 'c.banco', '=', 'b.id_banco')
             ->leftJoin('categorias as cc', 'c.categoria', '=', 'cc.categoria_id')
+            ->where('c.uid', '=', $uid)
             ->where('c.data_termino_recorrente', '>=', $firstDayOfMonth)
             ->where('c.data_termino_recorrente', '<=', $lastDayOfMonth)
             ->when($tabela === 'contas', function ($query) {
@@ -318,10 +349,15 @@ class Financa extends Model
 
     public function countContasCreditos(string $tabela)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
         $count = DB::table($tabela.' as c')
+            ->where('c.uid', '=', $uid)
             ->where(function($query) use ($firstDayOfMonth, $lastDayOfMonth) {
                 $query->where('c.recorrente', 1)
                     ->where('c.data_termino_recorrente', '>=', $firstDayOfMonth)
@@ -338,8 +374,13 @@ class Financa extends Model
 
     public static function obterContasPorVencimentoEStatus($dataVencimento)
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
         $registros = DB::table('contas')
             ->where('vencimento', '=', $dataVencimento)
+            ->where('c.uid', '=', $uid)
             ->where('status', '=', 1)
         ->get();
         return $registros;
@@ -347,9 +388,18 @@ class Financa extends Model
 
     public function searchNubankCreditos()
     {
+        $uid = DB::table('users')
+            ->where('email', '=', Session::get('userEmail'))
+        ->value('id');
+
+        $firstDayOfMonth = now()->startOfMonth()->toDateString();
+        $lastDayOfMonth = now()->endOfMonth()->toDateString();
+
         // Realiza a consulta na tabela de contas
         $contasBanco = DB::table('contas')
             ->where('descricao', 'like', '%BANK%')
+            ->where('uid', '=', $uid)
+            ->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])
             ->get()
         ->toArray();
 
@@ -359,6 +409,8 @@ class Financa extends Model
         // Realiza a consulta na tabela de creditos onde banco = 2
         $creditosBanco2 = DB::table('creditos')
             ->where('banco', '=', 2)
+            ->where('uid', '=', $uid)
+            ->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])
             ->get()
         ->toArray();
 
@@ -375,6 +427,14 @@ class Financa extends Model
         ->first();
     }
 
+    public function getTotalMesAtual()
+    {
+        $mesAtual = Carbon::now()->format('Y-m');
+        return DB::table('totalMes')
+            ->where('mes_referencia', '=', $mesAtual)
+        ->value('total_mes');
+    }
+
     public function calcularSaldoMes()
     {
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
@@ -382,10 +442,13 @@ class Financa extends Model
 
         $creditos = DB::table('creditos')->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
         $contas = DB::table('contas')->whereBetween('data_termino_recorrente', [$firstDayOfMonth, $lastDayOfMonth])->sum('valor');
-        return $creditos - $contas;
+
+        $saldo = $creditos - $contas;
+        $saldoFormatado = number_format($saldo, 2, '.', '');
+        return $saldoFormatado;
     }
 
-    public function salvarSaldoNoTotalMes($saldo)
+    public function salvarSaldoTotalMes($saldo)
     {
         $mesReferencia = now()->format('Y-m');
         return DB::table('totalMes')->updateOrInsert(

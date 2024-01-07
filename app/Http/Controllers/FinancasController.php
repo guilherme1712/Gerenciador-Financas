@@ -6,6 +6,7 @@ use App\Models\Financa;
 use Illuminate\Http\Request;
 use App\Http\Requests\ContaRequest;
 use App\Http\Requests\CreditoRequest;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\EmailController;
 
 class FinancasController extends Controller
@@ -192,6 +193,10 @@ class FinancasController extends Controller
     {
         if ($request->isMethod('post')) {
             $data = $request->input();
+
+            if ($data['recorrente'] == 0) {
+                $data['recorrente'] = 2;
+            }
             // Se recorrente for 1 e data_termino_recorrente estiver definido
             if ($data['recorrente'] == 1 && isset($data['data_termino_recorrente'])) {
                 $dates = [];
@@ -223,7 +228,6 @@ class FinancasController extends Controller
                 // Se não for recorrente ou data_termino_recorrente não estiver definido, salve a conta única
                 $this->financa->saveCredito($data);
             }
-
             return redirect()->route('home');
         }
     }

@@ -23,12 +23,15 @@ class CalcularSaldoMensal implements ShouldQueue
     {
         $financa = new Financa();
         try {
+            $saldoMesAtual = $financa->getTotalMesAtual();
             $saldo = $financa->calcularSaldoMes();
-            $financa->salvarSaldoNoTotalMes($saldo);
 
-            JobEstado::create(['executado' => true, 'created_at' => now(), 'jobname' => self::class]);
-            $saldoProximoMes = $saldo;
-            Log::info("Job " . self::class . "executado às " . now()->toTimeString().". Saldo para o próximo mês: $saldoProximoMes");
+            if ($saldo != $saldoMesAtual) {
+                $financa->salvarSaldoTotalMes($saldo);
+
+                JobEstado::create(['executado' => true, 'created_at' => now(), 'jobname' => self::class]);
+                Log::info("Job " . self::class . "executado às " . now()->toTimeString().". Saldo para o próximo mês: $saldo");
+            }
         } catch (\Exception $e) {
             Log::error("Erro ao executar job " . self::class . $e->getMessage());
         }

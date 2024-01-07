@@ -1,9 +1,9 @@
 <!-- Modal -->
-<div class="modal fade" id="contaModal" tabindex="-1" role="dialog" aria-labelledby="contaModalLabel" aria-hidden="true">
+<div class="modal fade" id="contaModal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="contaModalLabel"></h5>
+                <h5 class="modal-title" id="modal-title"></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -25,7 +25,7 @@
                     <strong>Recorrente: </strong>
                     <span id="modalRecorrente"> </span>
                 </p>
-                <p>
+                <p class="dataTerminoRecorrente-field">
                     <strong>Data Término Recorrente: </strong>
                     <span id="modalDataTerminoRecorrente"> </span>
                 </p>
@@ -42,7 +42,7 @@
                     <span id="modalCategoria"> </span>
                 </p>
 
-                <input type="hidden" id="contaIdModal" class="contaIdModal">
+                <input type="hidden" id="idHidden" class="idHidden">
             </div>
         </div>
     </div>

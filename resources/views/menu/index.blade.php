@@ -31,21 +31,21 @@
     <div class="btn-group" style="margin-top: 20px;">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Adicionar</button>
         <div class="dropdown-menu">
-            <a class="dropdown-item" href="{{ url('/financas/addConta') }}">Adicionar Nova Conta</a>
-            <a class="dropdown-item" href="{{ url('/financas/addCredito') }}">Adicionar Novo Crédito</a>
+            <a class="dropdown-item" href="{{ url('/financas/contas/addConta') }}">Adicionar Nova Conta</a>
+            <a class="dropdown-item" href="{{ url('/financas/creditos/addCredito') }}">Adicionar Novo Crédito</a>
         </div>
     </div>
 
     <div class="btn-group" style="margin-top: 20px;">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Histórico</button>
         <div class="dropdown-menu">
-            <a class="dropdown-item" href="{{ url('/financas/buscaListadoContas') }}">Histórico de Contas</a>
-            <a class="dropdown-item" href="{{ url('/financas/buscaListadoCreditos') }}">Histórico de Créditos</a>
+            <a class="dropdown-item" href="{{ url('/financas/listados/buscaListadoContas') }}">Histórico de Contas</a>
+            <a class="dropdown-item" href="{{ url('/financas/listados/buscaListadoCreditos') }}">Histórico de Créditos</a>
         </div>
     </div>
 
     <div style="margin-top: 20px;">
-        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/faturas">Fatura Cartão de Credito</a>
+        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/faturas/index">Fatura Cartão de Credito</a>
     </div>
 
     <div style="margin-top: 20px;">
@@ -53,7 +53,7 @@
     </div>
 
     <div style="margin-top: 50px; align-self: center;">
-        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/admin">Administrar</a>
+        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/admin/adminIndex">Administrar</a>
     </div>
 
     <div style="margin-top: 50px; align-self: center;">

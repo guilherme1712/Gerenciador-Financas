@@ -36,12 +36,16 @@ class Contas extends Mailable
         $fileName = 'CONTA_CORRENE.xlsx';
         $subjectSuffix = count($this->contas) === 1 ? '1 conta' : count($this->contas) . ' contas';
 
-        return $this->view('emails.contas')
+        $email = $this->view('emails.contas')
             ->subject('Contas a Pagar - ' . $subjectSuffix)
-            ->from('testesmtp17@gmail.com', 'Laravel - ContaCorrente')
-            ->attach($filePath, [
+            ->from('testesmtp17@gmail.com', 'Laravel - ContaCorrente');
+
+        if (file_exists($filePath)) {
+            $email->attach($filePath, [
                 'as' => $fileName,
                 'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]);
+        }
+        return $email;
     }
 }

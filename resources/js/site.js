@@ -41,7 +41,6 @@ function getTablesIndexFinancas() {
 
 function selectDataRecorrente() {
     $('#recorrente').on('change', function () {
-        // Se recorrente é igual a 'Sim'
         if ($(this).val() === '1') {
             $('#data_termino_recorrente_container').show();
         } else {
@@ -123,23 +122,33 @@ function modalDetalhesConta() {
                 _token: csrfToken,
             },
             success: function(response) {
-
                 $('.modal-title').html('Detalhes da Conta');
 
-                $("#contaIdModal").text(response.contaData[0].id);
-                let data = response.contaData[0].data;
-                let dataFormatada = formatarData(data);
-                $("#modalData").text(dataFormatada);
-                $("#modalDescricao").text(response.contaData[0].descricao);
-                $("#modalValor").text(response.contaData[0].valor);
-                $("#modalRecorrente").text(response.contaData[0].recorrente == 1 ? 'Sim' : 'Não');
-                let dataTerminoRecorrente = response.contaData[0].data_termino_recorrente;
-                let dataTerminoRecorrenteFormatada = formatarData(dataTerminoRecorrente);
-                $("#modalDataTerminoRecorrente").text(dataTerminoRecorrenteFormatada);
+                $("#idHidden").text(response.contaData[0].id);
                 $("#modalStatus").text(response.contaData[0].status == 1 ? 'Pago' : 'Não Pago');
                 $("#modalBanco").text(response.contaData[0].nome);
                 $("#modalCategoria").text(response.contaData[0].nomeCategoria);
+                $("#modalDescricao").text(response.contaData[0].descricao);
+                $("#modalRecorrente").text(response.contaData[0].recorrente == 1 ? 'Sim' : 'Não');
 
+                let dataTerminoRecorrenteFormatada = formatarData(response.contaData[0].data_termino_recorrente);
+                if (response.contaData[0].recorrente == 1) {
+                    $("#modalDataTerminoRecorrente").text(dataTerminoRecorrenteFormatada);
+                    $(".dataTerminoRecorrente-field").show();
+                } else {
+                    $(".dataTerminoRecorrente-field").hide();
+                }
+
+                let dataFormatada = formatarData(response.contaData[0].data);
+                $("#modalData").text(dataFormatada);
+
+                let valorFormatado = parseFloat(response.contaData[0].valor).toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                $("#modalValor").text(valorFormatado);
                 $("#contaModal").modal('show');
             },
             error: function(error) {
@@ -162,23 +171,33 @@ function modalDetalhesCredito() {
                 _token: csrfToken,
             },
             success: function(response) {
-
                 $('.modal-title').html('Detalhes do Crédito');
 
-                $("#contaIdModal").text(response.creditoData[0].id);
-                let data = response.creditoData[0].data;
-                let dataFormatada = formatarData(data);
-                $("#modalData").text(dataFormatada);
+                $("#idHidden").text(response.creditoData[0].id);
                 $("#modalDescricao").text(response.creditoData[0].descricao);
-                $("#modalValor").text(response.creditoData[0].valor);
                 $("#modalRecorrente").text(response.creditoData[0].recorrente == 1 ? 'Sim' : 'Não');
-                let dataTerminoRecorrente = response.creditoData[0].data_termino_recorrente;
-                let dataTerminoRecorrenteFormatada = formatarData(dataTerminoRecorrente);
-                $("#modalDataTerminoRecorrente").text(dataTerminoRecorrenteFormatada);
                 $("#modalStatus").text(response.creditoData[0].status == 1 ? 'Creditado' : 'Não Creditado');
                 $("#modalBanco").text(response.creditoData[0].nome);
                 $("#modalCategoria").text(response.creditoData[0].nomeCategoria);
 
+                let dataTerminoRecorrenteFormatada = formatarData(response.creditoData[0].data_termino_recorrente);
+                if (response.creditoData[0].recorrente == 1) {
+                    $("#modalDataTerminoRecorrente").text(dataTerminoRecorrenteFormatada);
+                    $(".dataTerminoRecorrente-field").show();
+                } else {
+                    $(".dataTerminoRecorrente-field").hide();
+                }
+
+                let dataFormatada = formatarData(response.creditoData[0].data);
+                $("#modalData").text(dataFormatada);
+
+                let valorFormatado = parseFloat(response.creditoData[0].valor).toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                $("#modalValor").text(valorFormatado);
                 $("#contaModal").modal('show');
             },
             error: function(error) {
