@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
@@ -70,6 +71,22 @@ class AuthController extends Controller
 
             $user->image_path = $imagePath;
             $user->save();
+
+            $sourceDirectory = storage_path('app/img/user_images');
+            $destinationDirectory = public_path('img/user_images');
+
+            if (File::isDirectory($sourceDirectory) && File::exists($sourceDirectory)) {
+                $files = File::allFiles($sourceDirectory);
+
+                foreach ($files as $file) {
+                    $filename = $file->getFilename();
+                    $sourcePath = $sourceDirectory . '/' . $filename;
+                    $destinationPath = $destinationDirectory . '/' . $filename;
+
+                    File::copy($sourcePath, $destinationPath);
+                    File::delete($sourcePath);
+                }
+            }
         }
         return redirect()->route('login')->with('success', 'Usuário registrado com sucesso! Faça o login para continuar.');
     }

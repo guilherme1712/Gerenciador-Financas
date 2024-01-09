@@ -56,7 +56,6 @@ mix
     ], 'public/css/datatables.css')
 
     .copy('resources/img/1.ico', 'public/img/1.ico')
-    .copy('storage/app/img/user_images/', 'public/img/user_images/')
     .sourceMaps();
 
 if (mix.inProduction()) {
