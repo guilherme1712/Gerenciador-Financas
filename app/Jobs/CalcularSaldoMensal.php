@@ -27,9 +27,9 @@ class CalcularSaldoMensal implements ShouldQueue
         $user = new User();
 
         try {
-            $uid = $user->getUid(Redis::get('userEmail'));
+            $uid = Redis::get('userId');
             $saldoMesAtual = $financa->getTotalMesAtual();
-            $saldo = $financa->calcularSaldoMes($uid);
+            $saldo = $financa->calcularSaldoMes();
 
             if ($saldo != $saldoMesAtual) {
                 $financa->salvarSaldoTotalMes($saldo);

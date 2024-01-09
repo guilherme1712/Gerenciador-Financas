@@ -16,10 +16,9 @@ class CheckAuthenticated
 
         $request->merge($inputs);
 
-        if (Auth::check()) {
+        if (Auth::check() && $this->userExistsInDatabase(Auth::user()->id)) {
             return $next($request);
         }
-
         return redirect('/login');
     }
 
@@ -28,5 +27,10 @@ class CheckAuthenticated
         $value = strip_tags($value);
         $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
         return $value;
+    }
+
+    private function userExistsInDatabase($userId)
+    {
+        return \App\Models\User::find($userId) !== null;
     }
 }

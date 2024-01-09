@@ -60,8 +60,12 @@
         <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/export-excel">Gerar Exel do Mês</a>
     </div>
 
-    <div style="margin-top: 50px; align-self: center;">
-        <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/admin/adminIndex">Administrar</a>
+    <div>
+        @if(app('redis')->get('userId') == 1)
+        <div style="margin-top: 50px; align-self: center;">
+            <a class="btn btn-primary" href="/APIs/Laravel/Gerenciador-Financas/public/financas/admin/adminIndex">Administrar</a>
+        </div>
+        @endif
     </div>
 
     <div style="margin-top: 50px; align-self: center;">

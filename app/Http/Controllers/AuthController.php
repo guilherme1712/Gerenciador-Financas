@@ -31,6 +31,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             Redis::set('userEmail', $credentials['email']);
             Redis::set('userName', $user->getUserName($credentials['email']));
+            Redis::set('userId', $user->getUid($credentials['email']));
 
             Session::put([
                 'userEmail' => $credentials['email'],

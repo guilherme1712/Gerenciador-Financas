@@ -351,25 +351,25 @@ class Financa extends Model
     {
         $uid = DB::table('users')
             ->where('email', '=', Redis::get('userEmail'))
-        ->value('id');
+            ->value('id');
 
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
-        $count = DB::table($tabela.' as c')
-            ->where('c.uid', '=', $uid)
-            ->where(function($query) use ($firstDayOfMonth, $lastDayOfMonth) {
+        return DB::table($tabela.' as c')
+            ->where(function($query) use ($firstDayOfMonth, $lastDayOfMonth, $uid) {
                 $query->where('c.recorrente', 1)
+                    ->where('c.uid', '=', $uid)
                     ->where('c.data_termino_recorrente', '>=', $firstDayOfMonth)
                     ->where('c.data_termino_recorrente', '<=', $lastDayOfMonth);
             })
-            ->orWhere(function($query) use ($firstDayOfMonth, $lastDayOfMonth) {
+            ->orWhere(function($query) use ($firstDayOfMonth, $lastDayOfMonth, $uid) {
                 $query->where('c.recorrente', 2)
+                    ->where('c.uid', '=', $uid)
                     ->where('c.data', '>=', $firstDayOfMonth)
                     ->where('c.data', '<=', $lastDayOfMonth);
             })
         ->count();
-        return $count;
     }
 
     public static function obterContasPorVencimentoEStatus($dataVencimento)
@@ -391,7 +391,6 @@ class Financa extends Model
         $uid = DB::table('users')
             ->where('email', '=', Redis::get('userEmail'))
         ->value('id');
-
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
@@ -416,22 +415,27 @@ class Financa extends Model
 
     public function getTotalMes()
     {
+        $uid = Redis::get('userId');
         $mesPassado = Carbon::now()->subMonth()->format('Y-m');
         return DB::table('totalMes')
+            ->where('uid', '=', $uid)
             ->where('mes_referencia', '=', $mesPassado)
         ->first();
     }
 
     public function getTotalMesAtual()
     {
+        $uid = Redis::get('userId');
         $mesAtual = Carbon::now()->format('Y-m');
         return DB::table('totalMes')
+            ->where('uid', '=', $uid)
             ->where('mes_referencia', '=', $mesAtual)
         ->value('total_mes');
     }
 
-    public function calcularSaldoMes(int $uid = null)
+    public function calcularSaldoMes()
     {
+        $uid = Redis::get('userId');
         $firstDayOfMonth = now()->startOfMonth()->toDateString();
         $lastDayOfMonth = now()->endOfMonth()->toDateString();
 
@@ -445,9 +449,10 @@ class Financa extends Model
 
     public function salvarSaldoTotalMes($saldo)
     {
+        $uid = Redis::get('userId');
         $mesReferencia = now()->format('Y-m');
         return DB::table('totalMes')->updateOrInsert(
-            ['mes_referencia' => $mesReferencia],
+            ['mes_referencia' => $mesReferencia, 'uid' => $uid],
             ['total_mes' => $saldo, 'created_at' => now()]
         );
     }
